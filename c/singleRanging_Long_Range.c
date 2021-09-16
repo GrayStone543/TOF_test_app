@@ -5,12 +5,12 @@
 #include "utils.h"
 
 
-VL53L0X_Error single_rangingTest(VL53L0X_Dev_t *pMyDevice)
+
+VL53L0X_Error long_range_rangingTest(VL53L0X_Dev_t *pMyDevice)
 {
     VL53L0X_Error Status = VL53L0X_ERROR_NONE;
     VL53L0X_RangingMeasurementData_t    RangingMeasurementData;
     int i;
-    FixPoint1616_t LimitCheckCurrent;
     uint32_t refSpadCount;
     uint8_t isApertureSpads;
     uint8_t VhvSettings;
@@ -43,34 +43,50 @@ VL53L0X_Error single_rangingTest(VL53L0X_Dev_t *pMyDevice)
     }
 
     // Enable/Disable Sigma and Signal check
+
+/*   if (Status == VL53L0X_ERROR_NONE) {
+        Status = VL53L0X_SetSequenceStepEnable(pMyDevice,VL53L0X_SEQUENCESTEP_DSS, 1);
+    }
+*/
+
     if (Status == VL53L0X_ERROR_NONE) {
         Status = VL53L0X_SetLimitCheckEnable(pMyDevice, VL53L0X_CHECKENABLE_SIGMA_FINAL_RANGE, 1);
     }
+
     if (Status == VL53L0X_ERROR_NONE) {
         Status = VL53L0X_SetLimitCheckEnable(pMyDevice, VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, 1);
     }
 
     if (Status == VL53L0X_ERROR_NONE) {
-        Status = VL53L0X_SetLimitCheckEnable(pMyDevice, VL53L0X_CHECKENABLE_RANGE_IGNORE_THRESHOLD, 1);
+        Status = VL53L0X_SetLimitCheckValue(pMyDevice, VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.1*65536));
     }
 
     if (Status == VL53L0X_ERROR_NONE) {
-        Status = VL53L0X_SetLimitCheckValue(pMyDevice, VL53L0X_CHECKENABLE_RANGE_IGNORE_THRESHOLD, (FixPoint1616_t)(1.5*0.023*65536));
+        Status = VL53L0X_SetLimitCheckValue(pMyDevice, VL53L0X_CHECKENABLE_SIGMA_FINAL_RANGE, (FixPoint1616_t)(60*65536));
+    }
+
+    if (Status == VL53L0X_ERROR_NONE) {
+        Status = VL53L0X_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 33000);
+    }
+
+    if (Status == VL53L0X_ERROR_NONE) {
+        Status = VL53L0X_SetVcselPulsePeriod(pMyDevice, VL53L0X_VCSEL_PERIOD_PRE_RANGE, 18);
+    }
+
+    if (Status == VL53L0X_ERROR_NONE) {
+        Status = VL53L0X_SetVcselPulsePeriod(pMyDevice, VL53L0X_VCSEL_PERIOD_FINAL_RANGE, 14);
     }
 
     /*
      *  Step  4 : Test ranging mode
      */
     if (Status == VL53L0X_ERROR_NONE) {
-        for (i=0; i<10; i++) {
+        for (i=0; i<50; i++) {
             printf ("Call of VL53L0X_PerformSingleRangingMeasurement\n");
             Status = VL53L0X_PerformSingleRangingMeasurement(pMyDevice, &RangingMeasurementData);
 
             print_pal_error(Status);
             print_range_status(&RangingMeasurementData);
-
-            VL53L0X_GetLimitCheckCurrent(pMyDevice, VL53L0X_CHECKENABLE_RANGE_IGNORE_THRESHOLD, &LimitCheckCurrent);
-            printf("RANGE IGNORE THRESHOLD: %f\n\n", (float)LimitCheckCurrent/65536.0);
 
             if (Status != VL53L0X_ERROR_NONE) break;
 
@@ -81,7 +97,7 @@ VL53L0X_Error single_rangingTest(VL53L0X_Dev_t *pMyDevice)
 }
 
 
-int single_ranging(void)
+int single_ranging_long_range(void)
 {
     VL53L0X_Error Status = VL53L0X_ERROR_NONE;
     VL53L0X_Dev_t MyDevice;
@@ -100,8 +116,8 @@ int single_ranging(void)
 
     // Initialize Comms
     pMyDevice->I2cDevAddr      = 0x52;
-    pMyDevice->comms_type      = 1;
-    pMyDevice->comms_speed_khz = 400;
+    pMyDevice->comms_type      =  1;
+    pMyDevice->comms_speed_khz =  400;
 
     Status = VL53L0X_i2c_init();
     if (Status != VL53L0X_ERROR_NONE) {
@@ -121,7 +137,6 @@ int single_ranging(void)
     /*
      *  Get the version of the VL53L0X API running in the firmware
      */
-
     if (Status == VL53L0X_ERROR_NONE) {
         status_int = VL53L0X_GetVersion(pVersion);
         if (status_int != 0)
@@ -163,7 +178,7 @@ int single_ranging(void)
     }
 
     if (Status == VL53L0X_ERROR_NONE) {
-        Status = single_rangingTest(pMyDevice);
+        Status = long_range_rangingTest(pMyDevice);
     }
 
     print_pal_error(Status);
@@ -182,7 +197,7 @@ int single_ranging(void)
     }
 
     print_pal_error(Status);
-
+	
 //    printf ("\nPress a Key to continue!");
 //    getchar();
     
