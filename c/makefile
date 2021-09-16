@@ -1,6 +1,11 @@
 CC = gcc
 RM = rm
 
+LIB_NAME := pyvl53l0x.so
+API_SOURCES := vl53l0x_api_calibration.c vl53l0x_api_core.c vl53l0x_api_ranging.c vl53l0x_api_strings.c vl53l0x_api.c
+API_SOURCES += vl53l0x_platform_log.c vl53l0x_platform.c vl53l0x_i2c_linux.c
+API_OBJECTS := $(addprefix vl53l0x_api/obj/, $(SOURCES:.c=.o))
+
 CFLAGS = -Wall
 
 INCDIR = vl53l0x_api/core/inc vl53l0x_api/platform/inc
@@ -20,6 +25,9 @@ all: api $(OBJDIR) $(OBJECTS)
 
 api:
 	make -C vl53l0x_api
+
+solib: api
+	$(CC) $(CFLAGS) -fPIC -shared -o $(LIB_NAME) pyvl53l0x.c $(API_OBJECTS)
 
 
 $(OBJDIR)/%.o: %.c
