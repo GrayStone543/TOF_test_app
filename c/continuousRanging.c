@@ -117,7 +117,7 @@ VL53L0X_Error continuous_rangingTest(VL53L0X_Dev_t *pMyDevice)
                 Status = VL53L0X_GetRangingMeasurementData(pMyDevice, pRangingMeasurementData);
 
                 *(pResults + measurement) = pRangingMeasurementData->RangeMilliMeter;
-                printf("In loop measurement %d: %d\n", measurement, pRangingMeasurementData->RangeMilliMeter);
+                printf("In loop measurement %d: %d mm\n", measurement, pRangingMeasurementData->RangeMilliMeter);
 
                 // Clear the interrupt
                 VL53L0X_ClearInterruptMask(pMyDevice, VL53L0X_REG_SYSTEM_INTERRUPT_GPIO_NEW_SAMPLE_READY);
@@ -130,7 +130,7 @@ VL53L0X_Error continuous_rangingTest(VL53L0X_Dev_t *pMyDevice)
 
         if (Status == VL53L0X_ERROR_NONE) {
             for(measurement=0; measurement<no_of_measurements; measurement++) {
-                printf("measurement %d: %d\n", measurement, *(pResults + measurement));
+                printf("measurement %d: %d mm\n", measurement, *(pResults + measurement));
             }
         }
 
