@@ -289,9 +289,9 @@ VL53L0X_Error VL53L0X_PollingDelay(VL53L0X_DEV Dev){
     timeout.tv_nsec = 1000;
 
     if (sigtimedwait(&mask, NULL, &timeout) < 0) {
-        if (errno == EAGAIN) {
-            printf("Timeout.");
-        }
+        // if (errno == EAGAIN) {
+        //     printf("Timeout.");
+        // }
     }
 
     LOG_FUNCTION_END(status);
