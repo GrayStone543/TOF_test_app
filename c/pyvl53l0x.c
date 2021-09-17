@@ -102,7 +102,6 @@ int VL53L0X_close()
 int VL53L0X_perform_ranging_measurement()
 {
     int status;
-    VL53L0X_RangingMeasurementData_t RangingMeasurementData;
 
     status = VL53L0X_PerformSingleRangingMeasurement(&Dev, &RangingMeasurementData);
 
