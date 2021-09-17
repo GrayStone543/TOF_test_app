@@ -1,28 +1,49 @@
-CC = gcc
-RM = rm
-AR = ar
+CC ?= gcc
+RM ?= rm
+AR ?= ar
 
-CFLAGS = -Wall -Icore/inc -Iplatform/inc
+CFLAGS ?= -Wall
 
-SRCDIR = src
+TARGET = libvl53l0x.a
+
+#SUB_DIR = core platform
+
+INCDIR = core/inc platform/inc
 OBJDIR = obj
+COREDIR = core/src
+PLATFORMDIR = platform/src
 
-SOURCES := vl53l0x_api_calibration.c vl53l0x_api_core.c vl53l0x_api_ranging.c vl53l0x_api_strings.c vl53l0x_api.c
-SOURCES += vl53l0x_platform_log.c vl53l0x_platform.c vl53l0x_i2c_linux.c
-OBJECTS := $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
+CORE_FILES = vl53l0x_api_calibration.c vl53l0x_api_core.c vl53l0x_api_ranging.c vl53l0x_api_strings.c vl53l0x_api.c
+PLATFORM_FILES = vl53l0x_platform_log.c vl53l0x_platform.c vl53l0x_i2c_linux.c
 
-all: $(OBJDIR) $(OBJECTS)
-	$(AR) rcs libvl53l0x.a $(OBJECTS)
+INC = $(foreach d, $(INCDIR), -I$d)
+SOURCES = $(CORE_FILES) $(PLATFORM_FILES)
+OBJECTS = $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
 
-$(OBJDIR)/%.o: core/$(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+all: $(TARGET)
 
-$(OBJDIR)/%.o: platform/$(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(OBJDIR)/%.o: $(COREDIR)/%.c
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+
+$(OBJDIR)/%.o: $(PLATFORMDIR)/%.c
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 $(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-.PHONY: clean
+$(TARGET): $(OBJDIR) $(OBJECTS)
+	$(AR) rcs $(TARGET) $(OBJECTS)
+
+#build_sub:
+#	@for s in $(SUB_DIR); do \
+#	$(MAKE) -C $$s;\
+#	done
+
+#$(TARGET): build_sub
+#	$(AR) rcs $(TARGET)
+
 clean:
-	$(RM) -f $(OBJDIR)/*.o libvl53l0x.a
+	@$(RM) -rf $(OBJDIR)
+	@$(RM) -f $(TARGET)
+
+.PHONY: clean all

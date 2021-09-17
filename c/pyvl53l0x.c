@@ -28,7 +28,7 @@ int VL53L0X_open()
     uint8_t VhvSettings;
     uint8_t PhaseCal;
 
-    Dev.I2cDevAddr = 0x52;
+    // Dev.I2cDevAddr = 0x52;
 
     status = VL53L0X_i2c_init();
     if (status == VL53L0X_ERROR_NONE) {
@@ -102,6 +102,7 @@ int VL53L0X_close()
 int VL53L0X_perform_ranging_measurement()
 {
     int status;
+    VL53L0X_RangingMeasurementData_t RangingMeasurementData;
 
     status = VL53L0X_PerformSingleRangingMeasurement(&Dev, &RangingMeasurementData);
 

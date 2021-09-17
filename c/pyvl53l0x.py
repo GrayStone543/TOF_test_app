@@ -2,26 +2,20 @@ import os
 import ctypes
 
 
-class VL53L0X:
-    def __init__(self):
-        so_fname = os.path.abspath("pyvl53l0x.so")
-        self.c_lib = ctypes.CDLL(so_fname)
-
-        VL53L0X_open = self.c_lib.VL53L0X_open
-        VL53L0X_open()
-
-    def perform_ranging_measurement(self):
-        VL53L0X_perform_ranging_measurement = self.c_lib.VL53L0X_perform_ranging_measurement
-        VL53L0X_get_range_millimeter = self.c_lib.VL53L0X_get_range_millimeter
-        VL53L0X_get_range_status = self.c_lib.VL53L0X_get_range_status
-
-        status = VL53L0X_perform_ranging_measurement()
-        if status == 0:
-            self.range_mm = VL53L0X_get_range_millimeter()
-            self.range_status = VL53L0X_get_range_status()
+# so_file = os.path.abspath("pyvl53l0x.so")
+cur_path = os.path.split(os.path.abspath(__file__))[0]
+so_file = os.path.join(cur_path, "pyvl53l0x.so")
+c_lib = ctypes.CDLL(so_file)
 
 
-    def __del__(self):
-        VL53L0X_close = self.c_lib.VL53L0X_close
-        VL53L0X_close()
+vl53l0x_open = c_lib.VL53L0X_open
+vl53l0x_close = c_lib.VL53L0X_close
+perform_ranging_measurement = c_lib.VL53L0X_perform_ranging_measurement
+get_range_millimeter = c_lib.VL53L0X_get_range_millimeter
+get_range_status = c_lib.VL53L0X_get_range_status
+get_range_status_str = c_lib.VL53L0X_get_range_status_str
+
+
+
+
 
