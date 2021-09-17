@@ -35,8 +35,11 @@ class MainWindow:
         self.range_label = tk.Label(self.root, text="---", anchor=tk.CENTER, borderwidth=3, relief=tk.RIDGE)
         self.range_label.place(x=20, y=36, width=200, height=28)
 
+        self.init_done = False
     
     def on_closing(self):
+        if self.init_done:
+            self.on_stop_btn()
         self.root.destroy()
 
     def on_resize(self, event):
@@ -59,13 +62,33 @@ class MainWindow:
             pass
 
     def on_start_btn(self):
-        pass
+        if not self.init_done:
+            vl53l0x_open()
+            self.init_done = True
+            self.root.after(2000, self.update_range)
 
     def on_stop_btn(self):
-        pass
+        if self.init_done:
+            self.init_done = False
+            vl53l0x_close()
 
     def mainloop(self):
         self.root.mainloop()
+
+    def update_range(self):
+        if self.init_done:
+            status = perform_ranging_measurement()
+            if status == 0:
+                range_status = get_range_status()
+                if range_status == 0:
+                    range_mm = get_range_millimeter()
+                    self.range_label.configure(text="{:d} mm".format(range_mm))
+                else:
+                    print("range status = {:d}".format(range_status))
+            else:
+                print("perform ranging status = {:d}".format(status))
+            self.root.after(2000, self.update_range)
+
 
 
 if __name__ == "__main__":
