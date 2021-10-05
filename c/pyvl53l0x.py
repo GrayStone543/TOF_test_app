@@ -17,5 +17,16 @@ get_range_status_str = c_lib.VL53L0X_get_range_status_str
 
 
 
+vl53l0x_open()
+
+for i in range(10):
+    status = perform_ranging_measurement()
+    print("status = {:d}".format(status))
+    range_status = get_range_status()
+    print("range status = {:d}".format(range_status))
+    range_mm = get_range_millimeter()
+    print("range = {:d} mm".format(range_mm))
+
+vl53l0x_close()
 
 

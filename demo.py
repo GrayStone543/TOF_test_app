@@ -14,6 +14,7 @@ perform_ranging_measurement = c_lib.VL53L0X_perform_ranging_measurement
 get_range_millimeter = c_lib.VL53L0X_get_range_millimeter
 get_range_status = c_lib.VL53L0X_get_range_status
 get_range_status_str = c_lib.VL53L0X_get_range_status_str
+get_range_status_str.restype = ctypes.c_char_p
 
 
 class MainWindow:
@@ -33,7 +34,7 @@ class MainWindow:
         self.stop_btn = tk.Button(self.root, text="Stop", command=self.on_stop_btn)
         self.stop_btn.place(x=150, y=4, width=120, height=28)
         self.range_label = tk.Label(self.root, text="---", anchor=tk.CENTER, borderwidth=3, relief=tk.RIDGE)
-        self.range_label.place(x=20, y=36, width=200, height=28)
+        self.range_label.place(x=20, y=36, width=250, height=28)
 
         self.init_done = False
     
@@ -45,7 +46,7 @@ class MainWindow:
     def on_resize(self, event):
         if type(event.widget).__name__ == "Tk":
             new_w, new_h = event.width, event.height
-            print("new window size: {:d} x {:d}".format(new_w, new_h))
+            #print("new window size: {:d} x {:d}".format(new_w, new_h))
 
     def on_key_release(self, event):
         if event.keysym == "Control_L":
@@ -84,7 +85,10 @@ class MainWindow:
                     range_mm = get_range_millimeter()
                     self.range_label.configure(text="{:d} mm".format(range_mm))
                 else:
+                    bytes_data = get_range_status_str()
+                    err_str = bytes_data.decode("ascii")
                     print("range status = {:d}".format(range_status))
+                    self.range_label.configure(text=err_str)
             else:
                 print("perform ranging status = {:d}".format(status))
             self.root.after(2000, self.update_range)

@@ -27,25 +27,26 @@ int VL53L0X_open()
     uint8_t isApertureSpads;
     uint8_t VhvSettings;
     uint8_t PhaseCal;
+    VL53L0X_Version_t Version;
 
-    // Dev.I2cDevAddr = 0x52;
+    Dev.I2cDevAddr = 0x52;
 
     status = VL53L0X_i2c_init();
     if (status == VL53L0X_ERROR_NONE) {
         init_done = 1;
 
-        // VL53L0X_GetVersion(&Version);
+        VL53L0X_GetVersion(&Version);
 
         status = VL53L0X_DataInit(&Dev); // Data initialization
         if (status == VL53L0X_ERROR_NONE) {
             status = VL53L0X_GetDeviceInfo(&Dev, &DeviceInfo);
             if (status == VL53L0X_ERROR_NONE) {
-                // printf("VL53L0X_GetDeviceInfo:\n");
-                // printf("Device Name : %s\n", DeviceInfo.Name);
-                // printf("Device Type : %s\n", DeviceInfo.Type);
-                // printf("Device ID : %s\n", DeviceInfo.ProductId);
-                // printf("ProductRevisionMajor : %d\n", DeviceInfo.ProductRevisionMajor);
-                // printf("ProductRevisionMinor : %d\n", DeviceInfo.ProductRevisionMinor);
+                printf("VL53L0X_GetDeviceInfo:\n");
+                printf("Device Name : %s\n", DeviceInfo.Name);
+                printf("Device Type : %s\n", DeviceInfo.Type);
+                printf("Device ID : %s\n", DeviceInfo.ProductId);
+                printf("ProductRevisionMajor : %d\n", DeviceInfo.ProductRevisionMajor);
+                printf("ProductRevisionMinor : %d\n", DeviceInfo.ProductRevisionMinor);
 
                 if ((DeviceInfo.ProductRevisionMinor != 1) && (DeviceInfo.ProductRevisionMinor != 1)) {
                     printf("Error expected cut 1.1 but found cut %d.%d\n", DeviceInfo.ProductRevisionMajor, DeviceInfo.ProductRevisionMinor);
@@ -102,7 +103,6 @@ int VL53L0X_close()
 int VL53L0X_perform_ranging_measurement()
 {
     int status;
-    VL53L0X_RangingMeasurementData_t RangingMeasurementData;
 
     status = VL53L0X_PerformSingleRangingMeasurement(&Dev, &RangingMeasurementData);
 
